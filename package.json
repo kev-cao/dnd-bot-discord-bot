@@ -1,0 +1,11 @@
+{
+  "name": "DnD_Bot",
+  "version": "1.0.0",
+  "description": "Has various features related to DnD.",
+  "main": "bot.js",
+  "author": "DefineCoding",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "winston": "^3.2.1"
+  }
+}

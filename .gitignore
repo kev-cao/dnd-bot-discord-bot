@@ -1,0 +1,4 @@
+auth.json
+setup.sh
+node_modules/
+nohup.out
