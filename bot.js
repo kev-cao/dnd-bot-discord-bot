@@ -32,35 +32,78 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // For die, command is d!roll [faces] [roll_count].
     switch (command) {
       case 'roll':
+        /*
+          Command Options:
+            d!roll d20
+            d!roll 5d12
+            d!roll 5d12 + 2
+        */
         let message = '';
 
-        if (args.length != 2 || (/[a-zA-z]/.test(args)) || !Number.isInteger(Number(args[0]))) {
-          message = "Please provide the command in the form of *d!roll [number_of_faces] [roll_count]*."
+        /*
+          This long list of conditionals checks if the arguments for the command d!roll are valid. They check the following for INVALIDITY, respectively:
+            1. Is the argument count greater than 3?
+            2. Is the argument count less than 1?
+            3. Is the argument count 2? 
+            4. Does the first argument not include a 'd'?
+            5. If there are 3 arguments, is the second one not a plus or a minus?
+            6. If there are 3 arguments, does the third one not a number?
+            7. Does the first argument have a number before the d (if there is something before the d)?
+            8. Does the first number have a number after the d?
+        */
+        if (args.length > 3 || args.length < 1 || args.length == 2 || !args[0].includes('d') || (args.length == 3 && ((args[1] != '+' && args[1] != '-')
+          || !(/^\d+$/).test(args[2])))) {
+            message = "Please provide the command in the form of *d!roll [# of die]d[# of faces] [+ or -] [modifier]*."
         } else {
-          let dieOptions = [4, 6, 8, 10, 12, 20];
-          let faceCount = args[0];
-          let rollCount = args[1];
+          let dIndex = args[0].indexOf('d');
+          let beforeD = args[0].substr(0, dIndex);
+          let afterD = args[0].substr(dIndex + 1);
 
-          if (!dieOptions.includes(Number(faceCount))) {
-            message = "Error: You can pick between a 4, 6, 8, 10, 12, and 20 sided die."
+          // This if condition checks for invalidity #7 and #8.
+          if ((beforeD != '' && !(/^\d+$/).test(beforeD)) || afterD == '' || !(/^\d+$/).test(afterD)) {
+            message = "Please provide the command in the form of *d!roll [# of die]d[# of faces] [+ or -] [modifier]*."
           } else {
-            if (rollCount > 10) {
-              bot.sendMessage({
-                to: channelID,
-                message: "Warning: Max allowed roll count is 10. Setting roll count to 10..."
-              });
-              rollCount = 10;
+            let dieOptions = [4, 6, 8, 10, 12, 20];
+            let rollCount = Number(beforeD); // If beforeD is empty, rollCount will be 0.
+            let faceCount = Number(afterD);
+            let modifier;
+            let modifierVal;
+
+            // Sets values of the modifier and modifier value if there are enough arguments.
+            if (args.length == 3) {
+              modifier = args[1] == '+' ? (a, b) => { return a + b } : (a, b) => { return a - b < 0 ? 0 : a - b};
+              modifierVal = Number(args[2]);
             }
-            
-            message = "Rolling d" + faceCount + "...\n";
 
-            for (i = 0; i < rollCount; i++) {
-              let result = Math.floor(Math.random() * faceCount) + 1;
+            // Check if the chosen faceCount is valid.
+            if (!dieOptions.includes(faceCount)) {
+              message = "Error: You can pick between a 4, 6, 8, 10, 12, and 20 sided die.";
+            } else {
+              
+              // First fix rollCount if it is too great or 0.
+              if (rollCount > 10) {
+                bot.sendMessage({
+                  to: channelID,
+                  message: "Warning: Max allowed roll count is 10. Setting roll count to 10..."
+                });
 
-              if (faceCount == 20 && result == 1) {
-                message += "**You rolled a 1. Critical fail.**\n";
-              } else {
-                message += result == 20 ? "**YOU ROLLED A NATURAL 20!**\n" : "You rolled a " + result + ".\n";
+                rollCount = 10;
+              } else if (rollCount == 0) {
+                rollCount = 1;
+              }
+
+              message = "Rolling " + rollCount + "d" + faceCount + "...\n";
+
+              // Loop to roll die and format message properly.
+              for (i = 0; i < rollCount; i++) {
+                let result = Math.floor(Math.random() * faceCount) + 1;
+                logger.info("Roll: " + result);
+
+                if (faceCount == 20 && result == 1) {
+                  message += "**Critical Fail. You rolled a 1.**\n";
+                } else {
+                  message += result == 20 ? "**:star:NATURAL 20!:star:**\n" : `Roll Total: ${args.length == 3 ? modifier(result, modifierVal) : result}\n`;
+                }
               }
             }
           }
