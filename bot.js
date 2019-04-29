@@ -97,7 +97,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
               // Loop to roll die and format message properly.
               for (i = 0; i < rollCount; i++) {
                 let result = Math.floor(Math.random() * faceCount) + 1;
-                logger.info("Roll: " + result);
 
                 if (faceCount == 20 && result == 1) {
                   message += "**Critical Fail. You rolled a 1.**\n";
