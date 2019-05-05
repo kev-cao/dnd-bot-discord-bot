@@ -94,10 +94,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
               message = "Rolling " + rollCount + "d" + faceCount + (args.length == 3 ? args[1] + " " + args[2] : "") + "...\n";
 
+              let total = 0;
               // Loop to roll die and format message properly.
               for (i = 0; i < rollCount; i++) {
                 let result = Math.floor(Math.random() * faceCount) + 1;
 
+                if (rollCount == 1 && faceCount == 20) {
+                  if (result == 1) {
+                    message += "**Critical Fail. You rolled a 1.**\n";
+                  } else if (result == 20) {
+                    message += "**:star:NATURAL 20!:star:**\n";
+                  }
+                }
                 if (faceCount == 20 && result == 1) {
                   message += "**Critical Fail. You rolled a 1.**\n";
                 } else {
