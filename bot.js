@@ -79,7 +79,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             if (!dieOptions.includes(faceCount)) {
               message = "Error: You can pick between a 4, 6, 8, 10, 12, and 20 sided die.";
             } else {
-              
               // First fix rollCount if it is too great or 0.
               if (rollCount > 10) {
                 bot.sendMessage({
@@ -104,6 +103,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     message += "**Critical Fail. You rolled a 1.**\n";
                   } else if (result == 20) {
                     message += "**:star:NATURAL 20!:star:**\n";
+                  } else {
+                    message += `**${result}** ${args.length == 3 ? `${args[1]} ${modifierVal} = ${modifier(total, modifierVal)}` : `= ${total}`}`;
                   }
                 } else {
                   total += rollCount;
@@ -112,6 +113,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                   } else {
                     message += `**${result}** ${args.length == 3 ? `${args[1]} ${modifierVal} = ${modifier(total, modifierVal)}` : `= ${total}`}`;
                   }
+                }
               }
             }
           }
@@ -121,7 +123,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         break;
     }
   }
-}
+});
 
 /**
  * Sends a delayed message to a given channel after a provided delay in ms. 
