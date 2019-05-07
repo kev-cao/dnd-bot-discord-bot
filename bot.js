@@ -121,7 +121,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         break;
     }
   }
-});
+}
 
 /**
  * Sends a delayed message to a given channel after a provided delay in ms. 
