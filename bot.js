@@ -105,12 +105,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                   } else if (result == 20) {
                     message += "**:star:NATURAL 20!:star:**\n";
                   }
-                }
-                if (faceCount == 20 && result == 1) {
-                  message += "**Critical Fail. You rolled a 1.**\n";
                 } else {
-                  message += result == 20 ? "**:star:NATURAL 20!:star:**\n" : `Roll Total: ${result} + ${modifierVal} = ${args.length == 3 ? modifier(result, modifierVal) : result}\n`;
-                }
+                  total += rollCount;
+                  if (i == rollCount - 1) {
+                    message += "**" + result + "** + ";
+                  } else {
+                    message += `**${result}** ${args.length == 3 ? `${args[1]} ${modifierVal} = ${modifier(total, modifierVal)}` : `= ${total}`}`;
+                  }
               }
             }
           }
